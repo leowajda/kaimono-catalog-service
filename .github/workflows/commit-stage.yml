@@ -1,0 +1,44 @@
+name: Commit Stage
+# run-name:
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+
+      - name: 📦️ Checkout source code
+        uses: actions/checkout@v3
+
+      - name: 📦️ Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '19'
+          cache: 'gradle'
+
+      - name: 📦️ Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: 🔒️ Code vulnerability scanning
+        uses: anchore/scan-action@v3
+        with:
+          path: "${{ github.workspace }}"
+          fail-build: false
+          severity-cutoff: high
+
+      - name: 📝 Upload vulnerability report
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+
+      - name: ✅ Build and test project
+        run: ./gradlew build
