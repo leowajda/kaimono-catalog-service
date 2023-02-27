@@ -13,8 +13,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
 class BookJsonTests {
+
     @Autowired
     private JacksonTester<Book> json;
+
     @ParameterizedTest
     @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
     void testSerialize(@CsvToBook Book book) throws Exception {
@@ -39,13 +41,13 @@ class BookJsonTests {
 
     @ParameterizedTest
     @ValueSource(strings = """
-           {
-                "isbn": "1234567890",
-                "title": "Thus Spoke Zarathustra",
-                "author": "Friedrich Nietzsche",
-                "price": 9.90
-           }
-            """)
+    {
+       "isbn": "1234567890",
+       "title": "Thus Spoke Zarathustra",
+       "author": "Friedrich Nietzsche",
+       "price": 9.90
+    }
+    """)
     void testDeserialize(String content) throws Exception {
         var expectedBook = new Book("1234567890", "Thus Spoke Zarathustra", "Friedrich Nietzsche", 9.90);
 

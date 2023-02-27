@@ -10,5 +10,4 @@ public interface BookRepository {
     void deleteByIsbn(String isbn);
     Book save(Book book);
 
-
 }

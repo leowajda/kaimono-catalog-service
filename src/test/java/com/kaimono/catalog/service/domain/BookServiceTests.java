@@ -44,4 +44,5 @@ public class BookServiceTests {
                 .isInstanceOf(BookNotFoundException.class)
                 .hasMessage("The book with ISBN " + isbn + " was not found.");
     }
+
 }

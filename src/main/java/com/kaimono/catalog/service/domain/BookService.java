@@ -43,5 +43,4 @@ public class BookService {
         .orElseGet(() -> addBookToCatalog(book));
     }
 
-
 }

@@ -30,7 +30,8 @@ public class BookControllerAdvice {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidationException(MethodArgumentNotValidException ex) {
-        return ex.getBindingResult().getAllErrors().stream().map(error -> Map.entry(((FieldError) error).getField(), error.getDefaultMessage()))
+        return ex.getBindingResult().getAllErrors().stream()
+                .map(error -> Map.entry(((FieldError) error).getField(), error.getDefaultMessage()))
                 .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 

@@ -36,4 +36,5 @@ public class InMemoryBookRepository implements BookRepository {
         books.put(book.isbn(), book);
         return book;
     }
+
 }
