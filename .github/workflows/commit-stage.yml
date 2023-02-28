@@ -6,8 +6,15 @@ on:
     branches:
       - master
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: leowajda/kaimono-catalog-service
+  VERSION: latest
+
 jobs:
+
   build:
+
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -43,3 +50,54 @@ jobs:
 
       - name: ✅ Build and test project
         run: ./gradlew build
+
+  package:
+
+    runs-on: ubuntu-latest
+    needs: [ build ]
+    permissions:
+      contents: read
+      packages: write
+      security-events: write
+
+    steps:
+
+      - name: 📦️ Checkout source code
+        uses: actions/checkout@v3
+
+      - name: 📦️ Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '19'
+          cache: 'gradle'
+
+      - name: 📦️ Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: 📦️ Build container image
+        run: ./gradlew bootBuildImage \
+          --imageName ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+
+      - name: 🔒️ Image vulnerability scanning
+        uses: anchore/scan-action@v3
+        id: scan
+        with:
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+          fail-build: false
+          severity-cutoff: high
+
+      - name: 📝 Upload vulnerability report
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: ${{ steps.scan.outputs.sarif }}
+
+      - name: 🔐 Log into container registry
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🚀 Publish container image
+        run: docker push ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
