@@ -1,3 +1,15 @@
+spring:
+  application:
+    name: kaimono-catalog-service
+
+kaimono:
+  faker:
+    enabled: true
+    data:
+      min-price: 5
+      max-price: 50
+      amount: 100
+
 server:
   port: 9001
   tomcat:
