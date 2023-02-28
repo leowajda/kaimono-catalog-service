@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 
+import java.time.Instant;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
@@ -42,14 +44,26 @@ class BookJsonTests {
     @ParameterizedTest
     @ValueSource(strings = """
     {
+       "id": 1,
        "isbn": "1234567890",
        "title": "Thus Spoke Zarathustra",
        "author": "Friedrich Nietzsche",
-       "price": 9.90
+       "price": 9.90,
+       "createdDate": "2023-02-28T15:13:38.312934931Z",
+       "lastModifiedDate": "2023-02-28T15:13:38.312934931Z",
+       "version": 0
     }
     """)
     void testDeserialize(String content) throws Exception {
-        var expectedBook = new Book("1234567890", "Thus Spoke Zarathustra", "Friedrich Nietzsche", 9.90);
+        var expectedBook = new Book(
+                1L,
+                "1234567890",
+                "Thus Spoke Zarathustra",
+                "Friedrich Nietzsche",
+                9.90,
+                Instant.parse("2023-02-28T15:13:38.312934931Z"),
+                Instant.parse("2023-02-28T15:13:38.312934931Z"),
+                0);
 
         assertThat(json.parse(content))
                 .usingRecursiveComparison()

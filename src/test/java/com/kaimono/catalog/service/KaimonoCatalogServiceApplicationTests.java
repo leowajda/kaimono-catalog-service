@@ -69,7 +69,17 @@ class KaimonoCatalogServiceApplicationTests {
                 .returnResult()
                 .getResponseBody();
 
-        var updatedBook = new Book(createdBook.isbn(), createdBook.title(), createdBook.author(), 7.9);
+        var updatedBook = new Book (
+                createdBook.id(),
+                createdBook.isbn(),
+                createdBook.title(),
+                createdBook.author(),
+                7.9,
+                createdBook.createdDate(),
+                createdBook.lastModifiedDate(),
+                createdBook.version()
+        );
+
         webTestClient
                 .put()
                 .uri("/books/" + book.isbn())

@@ -9,7 +9,7 @@ public class BookAggregator implements ArgumentsAggregator {
 
     @Override
     public Object aggregateArguments(ArgumentsAccessor accessor, ParameterContext context) throws ArgumentsAggregationException {
-        return new Book(
+        return Book.of(
                 accessor.getString(0),
                 accessor.getString(1),
                 accessor.getString(2),
