@@ -1,14 +1,16 @@
 spring:
   application:
     name: kaimono-catalog-service
-
-kaimono:
-  faker:
-    enabled: true
-    data:
-      min-price: 5
-      max-price: 50
-      amount: 100
+  datasource:
+    username: user
+    password: password
+    url: jdbc:postgresql://localhost:5432/kaimonodb_catalog
+    hikari:
+      connection-timeout: 2000
+      maximum-pool-size: 5
+  sql:
+    init:
+      mode: always
 
 server:
   port: 9001
@@ -18,3 +20,11 @@ server:
     threads:
       max: 50
       min-spare: 5
+
+kaimono:
+  faker:
+    enabled: true
+    data:
+      min-price: 5
+      max-price: 50
+      amount: 100
