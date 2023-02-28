@@ -46,6 +46,7 @@ public class KaimonoFakerLoader {
                 isbnFaker.regexify("([0-9]{10}|[0-9]{13})"),
                 bookFaker.book().title(),
                 bookFaker.book().author(),
+                bookFaker.book().publisher(),
                 (double) bookFaker.random().nextInt(
                         kaimonoFakerDataProperties.minPrice(),
                         kaimonoFakerDataProperties.maxPrice())

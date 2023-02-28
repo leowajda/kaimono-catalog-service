@@ -12,5 +12,4 @@ public class KaimonoCatalogServiceApplication {
 		SpringApplication.run(KaimonoCatalogServiceApplication.class, args);
 	}
 
-
 }
