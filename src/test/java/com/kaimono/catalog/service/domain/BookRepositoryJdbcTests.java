@@ -1,6 +1,7 @@
 package com.kaimono.catalog.service.domain;
 
 import com.kaimono.catalog.service.config.DataConfig;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -26,6 +27,11 @@ public class BookRepositoryJdbcTests {
 
     @Autowired
     private JdbcAggregateTemplate jdbcAggregateTemplate;
+
+    @BeforeEach
+    public void beforeEach() {
+        bookRepository.deleteAll();
+    }
 
     @ParameterizedTest
     @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
