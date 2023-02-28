@@ -33,10 +33,14 @@ public class BookService {
     public Book editBookDetails(String isbn, Book book) {
         return bookRepository.findByIsbn(isbn).map(prevBook -> {
             var currBook = new Book(
+                    prevBook.id(),
                     prevBook.isbn(),
                     book.title(),
                     book.author(),
-                    book.price()
+                    book.price(),
+                    prevBook.createdDate(),
+                    prevBook.lastModifiedDate(),
+                    prevBook.version()
             );
             return bookRepository.save(currBook);
         })

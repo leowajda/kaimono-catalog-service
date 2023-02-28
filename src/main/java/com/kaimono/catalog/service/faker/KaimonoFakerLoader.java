@@ -31,14 +31,18 @@ public class KaimonoFakerLoader {
 
     @EventListener(ApplicationReadyEvent.class)
     public void loadFakeBooks() {
-        Stream.generate(this::getFakeBook)
-                .map(bookRepository::save)
+        bookRepository.deleteAll();
+
+        var fakeBooks = Stream.generate(this::getFakeBook)
+                .peek(System.out::println)
                 .limit(kaimonoFakerDataProperties.amount())
-                .forEach(System.out::println); // TODO - replace with log
+                .toList();
+
+        bookRepository.saveAll(fakeBooks);
     }
 
     private Book getFakeBook() {
-        return new Book(
+        return Book.of(
                 isbnFaker.regexify("([0-9]{10}|[0-9]{13})"),
                 bookFaker.book().title(),
                 bookFaker.book().author(),
