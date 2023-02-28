@@ -76,8 +76,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
 
       - name: 📦️ Build container image
-        run: ./gradlew bootBuildImage \
-          --imageName ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
+        run: ./gradlew bootBuildImage --imageName ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.VERSION }}
 
       - name: 🔒️ Image vulnerability scanning
         uses: anchore/scan-action@v3
