@@ -34,7 +34,7 @@ public class BookRepositoryJdbcTests {
     }
 
     @ParameterizedTest
-    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
+    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     public void findBookByIsbnWhenExisting(@CsvToBook Book book) {
         jdbcAggregateTemplate.insert(book);
 
@@ -52,7 +52,7 @@ public class BookRepositoryJdbcTests {
     }
 
     @ParameterizedTest
-    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
+    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     void existsByIsbnWhenExisting(@CsvToBook Book book) {
         jdbcAggregateTemplate.insert(book);
 
@@ -68,7 +68,7 @@ public class BookRepositoryJdbcTests {
     }
 
     @ParameterizedTest
-    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
+    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     void deleteByIsbn(@CsvToBook Book book) {
 
         var persistedBook = jdbcAggregateTemplate.insert(book);

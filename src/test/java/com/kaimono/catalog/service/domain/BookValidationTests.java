@@ -20,14 +20,14 @@ public class BookValidationTests {
     }
 
     @ParameterizedTest
-    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
+    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     public void whenAllFieldsCorrectThenValidationSucceeds(@CsvToBook Book book) {
         var violations = validator.validate(book);
         assertThat(violations).isEmpty();
     }
 
     @ParameterizedTest
-    @CsvSource("'', Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
+    @CsvSource("'', Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     void whenIsbnNotDefinedThenValidationFails(@CsvToBook Book book) {
         var violations = validator.validate(book);
         assertThat(violations).hasSize(2);
@@ -42,7 +42,7 @@ public class BookValidationTests {
     }
 
     @ParameterizedTest
-    @CsvSource("AV34567890, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
+    @CsvSource("AV34567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     void whenIsbnDefinedButIncorrectThenValidationFails(@CsvToBook Book book) {
         var violations = validator.validate(book);
         assertThat(violations).hasSize(1);
@@ -52,7 +52,7 @@ public class BookValidationTests {
     }
 
     @ParameterizedTest
-    @CsvSource("1234567890, '', Friedrich Nietzsche, 9.90")
+    @CsvSource("1234567890, '', Friedrich Nietzsche, Adelphi, 9.90")
     void whenTitleIsNotDefinedThenValidationFails(@CsvToBook Book book) {
         var violations = validator.validate(book);
         assertThat(violations).hasSize(1);
@@ -62,7 +62,7 @@ public class BookValidationTests {
     }
 
     @ParameterizedTest
-    @CsvSource(value = "1234567890, Thus Spoke Zarathustra, N/A, 9.90", nullValues = "N/A")
+    @CsvSource(value = "1234567890, Thus Spoke Zarathustra, N/A, Adelphi, 9.90", nullValues = "N/A")
     void whenAuthorIsNotDefinedThenValidationFails(@CsvToBook Book book) {
         var violations = validator.validate(book);
         assertThat(violations).hasSize(1);
@@ -72,7 +72,7 @@ public class BookValidationTests {
     }
 
     @ParameterizedTest
-    @CsvSource(value = "1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, N/A", nullValues = "N/A")
+    @CsvSource(value = "1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, N/A", nullValues = "N/A")
     void whenPriceIsNotDefinedThenValidationFails(@CsvToBook Book book) {
         var violations = validator.validate(book);
         assertThat(violations).hasSize(1);
@@ -82,7 +82,7 @@ public class BookValidationTests {
     }
 
     @ParameterizedTest
-    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, 0.0")
+    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 0.0")
     void whenPriceDefinedButZeroThenValidationFails(@CsvToBook Book book) {
         var violations = validator.validate(book);
         assertThat(violations).hasSize(1);
@@ -92,7 +92,7 @@ public class BookValidationTests {
     }
 
     @ParameterizedTest
-    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, -9.90")
+    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, -9.90")
     void whenPriceDefinedButNegativeThenValidationFails(@CsvToBook Book book) {
         var violations = validator.validate(book);
         assertThat(violations).hasSize(1);

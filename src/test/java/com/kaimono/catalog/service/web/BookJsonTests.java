@@ -20,7 +20,7 @@ class BookJsonTests {
     private JacksonTester<Book> json;
 
     @ParameterizedTest
-    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
+    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     void testSerialize(@CsvToBook Book book) throws Exception {
         var jsonContent = json.write(book);
 
@@ -37,6 +37,10 @@ class BookJsonTests {
                 .isEqualTo(book.author());
 
         assertThat(jsonContent)
+                .extractingJsonPathStringValue("@.publisher")
+                .isEqualTo(book.publisher());
+
+        assertThat(jsonContent)
                 .extractingJsonPathNumberValue("@.price")
                 .isEqualTo(book.price());
     }
@@ -48,6 +52,7 @@ class BookJsonTests {
        "isbn": "1234567890",
        "title": "Thus Spoke Zarathustra",
        "author": "Friedrich Nietzsche",
+       "publisher": "Adelphi",
        "price": 9.90,
        "createdDate": "2023-02-28T15:13:38.312934931Z",
        "lastModifiedDate": "2023-02-28T15:13:38.312934931Z",
@@ -60,6 +65,7 @@ class BookJsonTests {
                 "1234567890",
                 "Thus Spoke Zarathustra",
                 "Friedrich Nietzsche",
+                "Adelphi",
                 9.90,
                 Instant.parse("2023-02-28T15:13:38.312934931Z"),
                 Instant.parse("2023-02-28T15:13:38.312934931Z"),

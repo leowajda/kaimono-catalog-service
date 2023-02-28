@@ -19,7 +19,7 @@ class KaimonoCatalogServiceApplicationTests {
     private WebTestClient webTestClient;
 
     @ParameterizedTest
-    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
+    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     void whenGetRequestWithIdThenBookReturned(@CsvToBook Book book) {
         var isbn = book.isbn();
         var expectedBook = webTestClient
@@ -44,7 +44,7 @@ class KaimonoCatalogServiceApplicationTests {
     }
 
     @ParameterizedTest
-    @CsvSource("1234567893, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
+    @CsvSource("1234567893, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     void whenPostRequestThenBookCreated(@CsvToBook Book book) {
         webTestClient
                 .post()
@@ -59,7 +59,7 @@ class KaimonoCatalogServiceApplicationTests {
     }
 
     @ParameterizedTest
-    @CsvSource("1234567895, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
+    @CsvSource("1234567895, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     void whenPutRequestThenBookUpdated(@CsvToBook Book book) {
         var createdBook = webTestClient
                 .post()
@@ -76,6 +76,7 @@ class KaimonoCatalogServiceApplicationTests {
                 createdBook.isbn(),
                 createdBook.title(),
                 createdBook.author(),
+                createdBook.publisher(),
                 7.9,
                 createdBook.createdDate(),
                 createdBook.lastModifiedDate(),
@@ -95,7 +96,7 @@ class KaimonoCatalogServiceApplicationTests {
     }
 
     @ParameterizedTest
-    @CsvSource("1234567897, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
+    @CsvSource("1234567897, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     void whenDeleteRequestThenBookDeleted(@CsvToBook Book book) {
         webTestClient
                 .post()

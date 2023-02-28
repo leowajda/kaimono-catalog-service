@@ -23,7 +23,7 @@ public class BookServiceTests {
     private BookService bookService;
 
     @ParameterizedTest
-    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, 9.90")
+    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     void whenBookToCreateAlreadyExistsThenThrows(@CsvToBook Book book) {
         var expectedIsbn = book.isbn();
 

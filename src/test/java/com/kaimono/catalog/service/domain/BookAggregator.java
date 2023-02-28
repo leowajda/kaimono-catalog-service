@@ -13,7 +13,8 @@ public class BookAggregator implements ArgumentsAggregator {
                 accessor.getString(0),
                 accessor.getString(1),
                 accessor.getString(2),
-                accessor.getDouble(3)
+                accessor.getString(3),
+                accessor.getDouble(4)
         );
     }
 
