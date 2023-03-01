@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kaimono-catalog-service
+  labels:
+    app: kaimono-catalog-service
+spec:
+  type: ClusterIP
+  selector:
+    app: kaimono-catalog-service
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9001
