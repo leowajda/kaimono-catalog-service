@@ -7,74 +7,74 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jdbc.core.JdbcAggregateTemplate;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
+import reactor.test.StepVerifier;
 
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-@DataJdbcTest
+@DataR2dbcTest
+@Testcontainers
 @Import(DataConfig.class)
-@ActiveProfiles("integration")
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-public class BookRepositoryJdbcTests {
+public class BookRepositoryTests {
 
     @Autowired
     private BookRepository bookRepository;
 
-    @Autowired
-    private JdbcAggregateTemplate jdbcAggregateTemplate;
+    @Container
+    private static final PostgreSQLContainer<?> postgresql =
+            new PostgreSQLContainer<>(DockerImageName.parse("postgres:14.4"));
+
+    @DynamicPropertySource
+    private static void postgresqlProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.r2dbc.username", postgresql::getUsername);
+        registry.add("spring.r2dbc.password", postgresql::getPassword);
+        registry.add("spring.flyway.url", postgresql::getJdbcUrl);
+        registry.add("spring.r2dbc.url", () ->
+                String.format("r2dbc:postgresql://%s:%s/%s",
+                        postgresql.getHost(),
+                        postgresql.getMappedPort(PostgreSQLContainer.POSTGRESQL_PORT),
+                        postgresql.getDatabaseName())
+        );
+    }
 
     @BeforeEach
     public void beforeEach() {
-        bookRepository.deleteAll();
+        bookRepository.deleteAll().subscribe();
     }
 
     @ParameterizedTest
     @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     public void findBookByIsbnWhenExisting(@CsvToBook Book book) {
-        jdbcAggregateTemplate.insert(book);
+        var savedBook = bookRepository.save(book)
+                .map(Book::isbn)
+                .flatMap(bookRepository::findByIsbn);
 
-        var retrievedBook = bookRepository.findByIsbn(book.isbn());
-
-        assertThat(retrievedBook).isPresent();
-        assertThat(retrievedBook.get().isbn()).isEqualTo(book.isbn());
+        StepVerifier.create(savedBook)
+                .expectNextMatches(incomingBook ->
+                        incomingBook.isbn().equals(book.isbn()))
+                .verifyComplete();
     }
 
     @ParameterizedTest
     @ValueSource(strings = "1234561238")
     void findBookByIsbnWhenNotExisting(String isbn) {
-        Optional<Book> actualBook = bookRepository.findByIsbn(isbn);
-        assertThat(actualBook).isEmpty();
-    }
-
-    @ParameterizedTest
-    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
-    void existsByIsbnWhenExisting(@CsvToBook Book book) {
-        jdbcAggregateTemplate.insert(book);
-
-        boolean exists = bookRepository.existsByIsbn(book.isbn());
-        assertThat(exists).isTrue();
-    }
-
-    @ParameterizedTest
-    @ValueSource(strings = "1234561238")
-    void existsByIsbnWhenNotExisting(String isbn) {
-        boolean existing = bookRepository.existsByIsbn(isbn);
-        assertThat(existing).isFalse();
+        var expectedBook = bookRepository.findByIsbn(isbn);
+        StepVerifier.create(expectedBook).verifyComplete();
     }
 
     @ParameterizedTest
     @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     void deleteByIsbn(@CsvToBook Book book) {
+        var savedBook = bookRepository.save(book)
+                .map(Book::isbn)
+                .flatMap(bookRepository::deleteByIsbn);
 
-        var persistedBook = jdbcAggregateTemplate.insert(book);
-        bookRepository.deleteByIsbn(book.isbn());
-        assertThat(jdbcAggregateTemplate.findById(persistedBook.id(), Book.class)).isNull();
+        StepVerifier.create(savedBook).verifyComplete();
     }
 
 }
