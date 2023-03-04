@@ -3,13 +3,18 @@ spring:
     name: kaimono-catalog-service
   lifecycle:
     timeout-per-shutdown-phase: 15s
-  datasource:
+  r2dbc:
     username: user
     password: password
+    url: r2dbc:postgresql://localhost:5432/kaimonodb_catalog
+    pool:
+      max-create-connection-time: 2s
+      initial-size: 5
+      max-size: 10
+  flyway:
+    user: ${spring.r2dbc.username}
+    password: ${spring.r2dbc.password}
     url: jdbc:postgresql://localhost:5432/kaimonodb_catalog
-    hikari:
-      connection-timeout: 2000
-      maximum-pool-size: 5
 
 server:
   port: 9001
@@ -23,8 +28,8 @@ server:
 
 kaimono:
   faker:
-    enabled: true
+    enabled: false
     data:
       min-price: 5
       max-price: 50
-      amount: 100
+      frequency: 1s

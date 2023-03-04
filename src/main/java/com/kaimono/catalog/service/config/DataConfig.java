@@ -1,8 +1,8 @@
 package com.kaimono.catalog.service.config;
 
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
+import org.springframework.data.r2dbc.config.EnableR2dbcAuditing;
 
 @Configuration
-@EnableJdbcAuditing
+@EnableR2dbcAuditing
 public class DataConfig { }
