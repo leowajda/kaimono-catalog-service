@@ -1,6 +1,8 @@
 package com.kaimono.catalog.service.domain;
 
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class BookService {
@@ -11,41 +13,50 @@ public class BookService {
         this.bookRepository = bookRepository;
     }
 
-    public Iterable<Book> viewBookList() {
+    public Flux<Book> viewBookList() {
         return bookRepository.findAll();
     }
 
-    public Book viewBookDetails(String isbn) {
-        return bookRepository.findByIsbn(isbn).orElseThrow(() -> new BookNotFoundException(isbn));
+    public Mono<Book> viewBookDetails(String isbn) {
+        return bookRepository.findByIsbn(isbn)
+                .switchIfEmpty(Mono.error(() ->
+                        new BookNotFoundException(isbn)));
     }
 
-    public Book addBookToCatalog(Book book) {
-        if (bookRepository.existsByIsbn(book.isbn()))
-            throw new BookAlreadyExistsException(book.isbn());
-
-        return bookRepository.save(book);
+    public Mono<Book> addBookToCatalog(Book book) {
+        return bookRepository.findByIsbn(book.isbn())
+                .flatMap(prevBook ->
+                        Mono.<Book>error(() ->
+                                new BookAlreadyExistsException(prevBook.isbn())))
+                .switchIfEmpty(Mono.fromSupplier(() -> book)
+                        .flatMap(bookRepository::save));
     }
 
-    public void removeBookFromCatalog(String isbn) {
-        bookRepository.deleteByIsbn(isbn);
+    public Mono<Void> removeBookFromCatalog(String isbn) {
+        return bookRepository.deleteByIsbn(isbn);
     }
 
-    public Book editBookDetails(String isbn, Book book) {
-        return bookRepository.findByIsbn(isbn).map(prevBook -> {
-            var currBook = new Book(
-                    prevBook.id(),
-                    prevBook.isbn(),
-                    book.title(),
-                    book.author(),
-                    book.publisher(),
-                    book.price(),
-                    prevBook.createdDate(),
-                    prevBook.lastModifiedDate(),
-                    prevBook.version()
-            );
-            return bookRepository.save(currBook);
-        })
-        .orElseGet(() -> addBookToCatalog(book));
+    public Mono<Book> editBookDetails(String isbn, Book newBook) {
+        return bookRepository.findByIsbn(isbn)
+                .flatMap(prevBook ->
+                        Mono.fromSupplier(() ->
+                                editBook(prevBook, newBook)).flatMap(bookRepository::save))
+                .switchIfEmpty(Mono.fromSupplier(() -> newBook)
+                        .flatMap(bookRepository::save));
+    }
+
+    private static Book editBook(Book prevBook, Book newBook) {
+        return new Book(
+                prevBook.id(),
+                prevBook.isbn(),
+                newBook.title(),
+                newBook.author(),
+                newBook.publisher(),
+                newBook.price(),
+                prevBook.createdDate(),
+                prevBook.lastModifiedDate(),
+                prevBook.version()
+        );
     }
 
 }

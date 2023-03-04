@@ -1,5 +1,6 @@
 package com.kaimono.catalog.service.domain;
 
+import junit.aggregator.book.CsvToBook;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -7,10 +8,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
 
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -27,22 +27,23 @@ public class BookServiceTests {
     void whenBookToCreateAlreadyExistsThenThrows(@CsvToBook Book book) {
         var expectedIsbn = book.isbn();
 
-        when(bookRepository.existsByIsbn(expectedIsbn))
-                .thenReturn(true);
+        when(bookRepository.findByIsbn(expectedIsbn))
+                .thenReturn(Mono.error(() ->
+                        new BookAlreadyExistsException(expectedIsbn)));
 
-        assertThatThrownBy(() -> bookService.addBookToCatalog(book))
-                .isInstanceOf(BookAlreadyExistsException.class)
-                .hasMessage("A book with ISBN " + expectedIsbn + " already exists.");
+        StepVerifier.create(bookService.addBookToCatalog(book))
+                .verifyErrorMessage("A book with ISBN " + expectedIsbn + " already exists.");
     }
 
     @ParameterizedTest
     @ValueSource(strings = "1234561232")
     void whenBookToReadDoesNotExistThenThrows(String isbn) {
-        when(bookRepository.findByIsbn(isbn)).thenReturn(Optional.empty());
+        when(bookRepository.findByIsbn(isbn))
+                .thenReturn(Mono.error(() ->
+                        new BookNotFoundException(isbn)));
 
-        assertThatThrownBy(() -> bookService.viewBookDetails(isbn))
-                .isInstanceOf(BookNotFoundException.class)
-                .hasMessage("The book with ISBN " + isbn + " was not found.");
+        StepVerifier.create(bookService.viewBookDetails(isbn))
+                .verifyErrorMessage("The book with ISBN " + isbn + " was not found.");
     }
 
 }

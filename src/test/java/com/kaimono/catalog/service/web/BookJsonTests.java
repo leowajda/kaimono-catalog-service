@@ -1,10 +1,10 @@
 package com.kaimono.catalog.service.web;
 
 import com.kaimono.catalog.service.domain.Book;
-import com.kaimono.catalog.service.domain.CsvToBook;
+import junit.aggregator.book.CsvToBook;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
@@ -21,7 +21,7 @@ class BookJsonTests {
 
     @ParameterizedTest
     @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
-    void testSerialize(@CsvToBook Book book) throws Exception {
+    public void testSerialize(@CsvToBook Book book) throws Exception {
         var jsonContent = json.write(book);
 
         assertThat(jsonContent)
@@ -45,21 +45,23 @@ class BookJsonTests {
                 .isEqualTo(book.price());
     }
 
-    @ParameterizedTest
-    @ValueSource(strings = """
-    {
-       "id": 1,
-       "isbn": "1234567890",
-       "title": "Thus Spoke Zarathustra",
-       "author": "Friedrich Nietzsche",
-       "publisher": "Adelphi",
-       "price": 9.90,
-       "createdDate": "2023-02-28T15:13:38.312934931Z",
-       "lastModifiedDate": "2023-02-28T15:13:38.312934931Z",
-       "version": 0
-    }
-    """)
-    void testDeserialize(String content) throws Exception {
+    @Test
+    public void testDeserialize() throws Exception {
+
+        var content = """
+            {
+                "id": 1,
+                "isbn": "1234567890",
+                "title": "Thus Spoke Zarathustra",
+                "author": "Friedrich Nietzsche",
+                "publisher": "Adelphi",
+                "price": 9.90,
+                "createdDate": "2023-02-28T15:13:38.312934931Z",
+                "lastModifiedDate": "2023-02-28T15:13:38.312934931Z",
+                "version": 0
+            }
+        """;
+
         var expectedBook = new Book(
                 1L,
                 "1234567890",

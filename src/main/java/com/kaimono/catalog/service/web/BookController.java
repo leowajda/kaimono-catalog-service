@@ -1,10 +1,14 @@
 package com.kaimono.catalog.service.web;
 
 import com.kaimono.catalog.service.domain.Book;
+import com.kaimono.catalog.service.domain.BookAlreadyExistsException;
 import com.kaimono.catalog.service.domain.BookService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.WebExchangeBindException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("books")
@@ -17,30 +21,33 @@ public class BookController {
     }
 
     @GetMapping
-    public Iterable<Book> get() {
+    public Flux<Book> get() {
         return bookService.viewBookList();
     }
 
     @GetMapping("{isbn}")
-    public Book getByIsbn(@PathVariable String isbn) {
+    public Mono<Book> getByIsbn(@PathVariable String isbn) {
         return bookService.viewBookDetails(isbn);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Book post(@Valid @RequestBody Book book) {
-        return bookService.addBookToCatalog(book);
+    public Mono<Book> post(@RequestBody @Valid Mono<Book> book) {
+        return book.flatMap(bookService::addBookToCatalog)
+                .onErrorResume(BookAlreadyExistsException.class, Mono::error)
+                .onErrorResume(WebExchangeBindException.class, Mono::error);
     }
 
     @DeleteMapping("{isbn}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable String isbn) {
-        bookService.removeBookFromCatalog(isbn);
+    public Mono<Void> delete(@PathVariable String isbn) {
+        return bookService.removeBookFromCatalog(isbn);
     }
 
     @PutMapping("{isbn}")
-    public Book put(@PathVariable String isbn, @Valid @RequestBody Book book) {
-        return bookService.editBookDetails(isbn, book);
+    public Mono<Book> put(@PathVariable String isbn, @RequestBody @Valid Mono<Book> book) {
+        return book.flatMap(resolvedBook -> bookService.editBookDetails(isbn, resolvedBook))
+                .onErrorResume(WebExchangeBindException.class, Mono::error);
     }
 
 }

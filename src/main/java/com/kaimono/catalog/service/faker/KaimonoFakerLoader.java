@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 
 import java.util.stream.Stream;
 
@@ -18,11 +19,10 @@ public class KaimonoFakerLoader {
 
     private final KaimonoFakerDataProperties kaimonoFakerDataProperties;
     private final BookRepository bookRepository;
-
     private final ProviderRegistration isbnFaker;
     private final Faker bookFaker;
 
-    public KaimonoFakerLoader(BookRepository bookRepository, KaimonoFakerDataProperties kaimonoFakerDataProperties) {
+    public KaimonoFakerLoader(KaimonoFakerDataProperties kaimonoFakerDataProperties, BookRepository bookRepository) {
         this.kaimonoFakerDataProperties = kaimonoFakerDataProperties;
         this.bookRepository = bookRepository;
         this.isbnFaker = new Faker().unique().getFaker();
@@ -30,27 +30,23 @@ public class KaimonoFakerLoader {
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    public void loadFakeBooks() {
-        bookRepository.deleteAll();
-
-        var fakeBooks = Stream.generate(this::getFakeBook)
-                .peek(System.out::println)
-                .limit(kaimonoFakerDataProperties.amount())
-                .toList();
-
-        bookRepository.saveAll(fakeBooks);
+    public Flux<Book> loadFakeBooks() {
+        return Flux.fromStream(Stream.generate(this::getFakeBook))
+                .flatMap(bookRepository::save)
+                .doOnEach(System.out::println) // TODO - replace with logs
+                .delayElements(kaimonoFakerDataProperties.frequency());
     }
 
     private Book getFakeBook() {
-        return Book.of(
-                isbnFaker.regexify("([0-9]{10}|[0-9]{13})"),
-                bookFaker.book().title(),
-                bookFaker.book().author(),
-                bookFaker.book().publisher(),
-                (double) bookFaker.random().nextInt(
-                        kaimonoFakerDataProperties.minPrice(),
-                        kaimonoFakerDataProperties.maxPrice())
+
+        var fakeBook = bookFaker.book();
+        var fakeIsbn = isbnFaker.regexify("([0-9]{10}|[0-9]{13})");
+        var fakePrice = (double) bookFaker.random().nextInt(
+                kaimonoFakerDataProperties.minPrice(),
+                kaimonoFakerDataProperties.maxPrice()
         );
+
+        return Book.of(fakeIsbn, fakeBook.title(), fakeBook.author(), fakeBook.publisher(), fakePrice);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.kaimono.catalog.service.domain;
+package junit.aggregator.book;
 
 import org.junit.jupiter.params.aggregator.AggregateWith;
 
