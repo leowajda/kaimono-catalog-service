@@ -48,7 +48,9 @@ public class BookService {
                 newBook.price(),
                 prevBook.createdDate(),
                 prevBook.lastModifiedDate(),
-                prevBook.version()
+                prevBook.version(),
+                prevBook.createdBy(),
+                prevBook.lastModifiedBy()
         );
     }
 

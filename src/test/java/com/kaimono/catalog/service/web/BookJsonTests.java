@@ -58,7 +58,9 @@ class BookJsonTests {
                 "price": 9.90,
                 "createdDate": "2023-02-28T15:13:38.312934931Z",
                 "lastModifiedDate": "2023-02-28T15:13:38.312934931Z",
-                "version": 0
+                "version": 0,
+                "createdBy": "sample-employee",
+                "lastModifiedBy": "sample-employee"
             }
         """;
 
@@ -71,7 +73,9 @@ class BookJsonTests {
                 9.90,
                 Instant.parse("2023-02-28T15:13:38.312934931Z"),
                 Instant.parse("2023-02-28T15:13:38.312934931Z"),
-                0);
+                0,
+                "sample-employee",
+                "sample-employee");
 
         assertThat(json.parse(content))
                 .usingRecursiveComparison()

@@ -134,7 +134,9 @@ class KaimonoCatalogServiceApplicationTests {
                 7.9,
                 createdBook.createdDate(),
                 createdBook.lastModifiedDate(),
-                createdBook.version()
+                createdBook.version(),
+                createdBook.createdBy(),
+                createdBook.lastModifiedBy()
         );
 
         webClient
