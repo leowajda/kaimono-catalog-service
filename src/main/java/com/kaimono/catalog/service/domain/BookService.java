@@ -19,17 +19,13 @@ public class BookService {
 
     public Mono<Book> viewBookDetails(String isbn) {
         return bookRepository.findByIsbn(isbn)
-                .switchIfEmpty(Mono.error(() ->
-                        new BookNotFoundException(isbn)));
+                .switchIfEmpty(Mono.error(() -> new BookNotFoundException(isbn)));
     }
 
     public Mono<Book> addBookToCatalog(Book book) {
         return bookRepository.findByIsbn(book.isbn())
-                .flatMap(prevBook ->
-                        Mono.<Book>error(() ->
-                                new BookAlreadyExistsException(prevBook.isbn())))
-                .switchIfEmpty(Mono.fromSupplier(() -> book)
-                        .flatMap(bookRepository::save));
+                .flatMap(prevBook -> Mono.<Book>error(() -> new BookAlreadyExistsException(prevBook.isbn())))
+                .switchIfEmpty(Mono.just(book).flatMap(bookRepository::save));
     }
 
     public Mono<Void> removeBookFromCatalog(String isbn) {
@@ -38,11 +34,8 @@ public class BookService {
 
     public Mono<Book> editBookDetails(String isbn, Book newBook) {
         return bookRepository.findByIsbn(isbn)
-                .flatMap(prevBook ->
-                        Mono.fromSupplier(() ->
-                                editBook(prevBook, newBook)).flatMap(bookRepository::save))
-                .switchIfEmpty(Mono.fromSupplier(() -> newBook)
-                        .flatMap(bookRepository::save));
+                .flatMap(prevBook -> Mono.just(editBook(prevBook, newBook)).flatMap(bookRepository::save))
+                .switchIfEmpty(Mono.just(newBook).flatMap(bookRepository::save));
     }
 
     private static Book editBook(Book prevBook, Book newBook) {
