@@ -28,8 +28,7 @@ public class BookServiceTests {
         var expectedIsbn = book.isbn();
 
         when(bookRepository.findByIsbn(expectedIsbn))
-                .thenReturn(Mono.error(() ->
-                        new BookAlreadyExistsException(expectedIsbn)));
+                .thenReturn(Mono.error(new BookAlreadyExistsException(expectedIsbn)));
 
         StepVerifier.create(bookService.addBookToCatalog(book))
                 .verifyErrorMessage("A book with ISBN " + expectedIsbn + " already exists.");
@@ -39,8 +38,7 @@ public class BookServiceTests {
     @ValueSource(strings = "1234561232")
     void whenBookToReadDoesNotExistThenThrows(String isbn) {
         when(bookRepository.findByIsbn(isbn))
-                .thenReturn(Mono.error(() ->
-                        new BookNotFoundException(isbn)));
+                .thenReturn(Mono.error(new BookNotFoundException(isbn)));
 
         StepVerifier.create(bookService.viewBookDetails(isbn))
                 .verifyErrorMessage("The book with ISBN " + isbn + " was not found.");
