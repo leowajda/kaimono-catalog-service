@@ -8,6 +8,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -15,6 +16,8 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 import reactor.test.StepVerifier;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataR2dbcTest
 @Testcontainers
@@ -30,6 +33,29 @@ public class BookRepositoryTests {
 
     @ParameterizedTest
     @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
+    void whenCreateBookNotAuthenticatedThenNoAuditMetadata(@CsvToBook Book book) {
+        StepVerifier.create(bookRepository.save(book))
+                .assertNext(incomingBook -> {
+                    assertThat(incomingBook.createdBy()).isNull();
+                    assertThat(incomingBook.lastModifiedBy()).isNull();
+                })
+                .verifyComplete();
+    }
+
+    @ParameterizedTest
+    @WithMockUser("mock-user")
+    @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
+    void whenCreateBookAuthenticatedThenAuditMetadata(@CsvToBook Book book) {
+        StepVerifier.create(bookRepository.save(book))
+                .assertNext(incomingBook -> {
+                    assertThat(incomingBook.createdBy()).isEqualTo("mock-user");
+                    assertThat(incomingBook.lastModifiedBy()).isEqualTo("mock-user");
+                })
+                .verifyComplete();
+    }
+
+    @ParameterizedTest
+    @CsvSource("1234563890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     public void findBookByIsbnWhenExisting(@CsvToBook Book book) {
         var savedBook = bookRepository.save(book)
                 .map(Book::isbn)
