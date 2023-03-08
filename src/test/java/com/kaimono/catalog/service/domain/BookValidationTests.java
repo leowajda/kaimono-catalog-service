@@ -4,7 +4,6 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import junit.aggregator.book.CsvToBook;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -12,13 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BookValidationTests {
 
-    private Validator validator;
-
-    @BeforeEach
-    public void setUp() {
-        var factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
+    private static final Validator validator =
+            Validation.buildDefaultValidatorFactory().getValidator();
 
     @ParameterizedTest
     @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")

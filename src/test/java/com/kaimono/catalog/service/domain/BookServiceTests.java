@@ -25,13 +25,11 @@ public class BookServiceTests {
     @ParameterizedTest
     @CsvSource("1234567890, Thus Spoke Zarathustra, Friedrich Nietzsche, Adelphi, 9.90")
     void whenBookToCreateAlreadyExistsThenThrows(@CsvToBook Book book) {
-        var expectedIsbn = book.isbn();
-
-        when(bookRepository.findByIsbn(expectedIsbn))
-                .thenReturn(Mono.error(new BookAlreadyExistsException(expectedIsbn)));
+        when(bookRepository.findByIsbn(book.isbn()))
+                .thenReturn(Mono.error(new BookAlreadyExistsException(book.isbn())));
 
         StepVerifier.create(bookService.addBookToCatalog(book))
-                .verifyErrorMessage("A book with ISBN " + expectedIsbn + " already exists.");
+                .verifyErrorMessage("A book with ISBN " + book.isbn() + " already exists.");
     }
 
     @ParameterizedTest

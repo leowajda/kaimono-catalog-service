@@ -62,9 +62,7 @@ class KaimonoCatalogServiceApplicationTests {
                     .uri("/books")
                         .headers(header -> header.setBearerAuth(isabelleTokens.accessToken()))
                             .bodyValue(book)
-
                 .exchange()
-
                 .expectStatus()
                     .isCreated()
                 .expectBody(Book.class)
@@ -78,9 +76,7 @@ class KaimonoCatalogServiceApplicationTests {
         webClient
                 .get()
                     .uri("/books/" + book.isbn())
-
                 .exchange()
-
                 .expectStatus()
                     .isOk()
                 .expectBody(Book.class)
@@ -99,9 +95,7 @@ class KaimonoCatalogServiceApplicationTests {
                     .uri("/books")
                         .headers(header -> header.setBearerAuth(isabelleTokens.accessToken()))
                             .bodyValue(book)
-
                 .exchange()
-
                 .expectStatus()
                     .isCreated()
                 .expectBody(Book.class)
@@ -120,9 +114,7 @@ class KaimonoCatalogServiceApplicationTests {
                     .uri("/books")
                         .headers(header -> header.setBearerAuth(isabelleTokens.accessToken()))
                             .bodyValue(book)
-
                 .exchange()
-
                 .expectStatus()
                     .isCreated()
                 .expectBody(Book.class)
@@ -150,9 +142,7 @@ class KaimonoCatalogServiceApplicationTests {
                     .uri("/books/" + book.isbn())
                         .headers(header -> header.setBearerAuth(isabelleTokens.accessToken()))
                             .bodyValue(updatedBook)
-
                 .exchange()
-
                 .expectStatus()
                     .isOk()
                 .expectBody(Book.class)
@@ -171,9 +161,7 @@ class KaimonoCatalogServiceApplicationTests {
                     .uri("/books")
                         .headers(header -> header.setBearerAuth(isabelleTokens.accessToken()))
                             .bodyValue(book)
-
                 .exchange()
-
                 .expectStatus()
                     .isCreated();
 
@@ -181,18 +169,14 @@ class KaimonoCatalogServiceApplicationTests {
                 .delete()
                     .uri("/books/" + book.isbn())
                         .headers(header -> header.setBearerAuth(isabelleTokens.accessToken()))
-
                 .exchange()
-
                 .expectStatus()
                     .isNoContent();
 
         webClient
                 .get()
                     .uri("/books/" + book.isbn())
-
                 .exchange()
-
                 .expectStatus()
                     .isNotFound()
                 .expectBody(String.class)

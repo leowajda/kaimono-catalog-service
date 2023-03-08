@@ -47,16 +47,14 @@ class BookControllerTests {
                 .willReturn(Mono.just(book));
 
         var mockedJwt = SecurityMockServerConfigurers.mockJwt()
-                        .authorities(CUSTOMER_ROLE);
+                .authorities(CUSTOMER_ROLE);
 
         webClient
                 .mutateWith(mockedJwt)
                     .get()
                         .uri("/books/" + book.isbn())
                             .accept(MediaType.APPLICATION_JSON)
-
                 .exchange()
-
                 .expectStatus()
                     .isOk()
                 .expectBody(Book.class)
@@ -73,9 +71,7 @@ class BookControllerTests {
                 .get()
                     .uri("/books/" + book.isbn())
                         .accept(MediaType.APPLICATION_JSON)
-
                 .exchange()
-
                 .expectStatus()
                     .isOk()
                 .expectBody(Book.class)
@@ -96,9 +92,7 @@ class BookControllerTests {
                     .get()
                         .uri("/books/" + isbn)
                             .accept(MediaType.APPLICATION_JSON)
-
                 .exchange()
-
                 .expectStatus()
                     .isNotFound()
                 .expectBody(String.class)
@@ -115,9 +109,7 @@ class BookControllerTests {
                 .get()
                     .uri("/books/" + isbn)
                         .accept(MediaType.APPLICATION_JSON)
-
                 .exchange()
-
                 .expectStatus()
                     .isNotFound()
                 .expectBody(String.class)
@@ -134,9 +126,7 @@ class BookControllerTests {
                     .delete()
                         .uri("/books/" + isbn)
                             .accept(MediaType.APPLICATION_JSON)
-
                 .exchange()
-
                 .expectStatus()
                     .isNoContent()
                 .expectBody()
@@ -154,9 +144,7 @@ class BookControllerTests {
                     .delete()
                         .uri("/books/" + isbn)
                             .accept(MediaType.APPLICATION_JSON)
-
                 .exchange()
-
                 .expectStatus()
                     .isForbidden()
                 .expectBody()
@@ -170,9 +158,7 @@ class BookControllerTests {
                 .delete()
                     .uri("/books/" + isbn)
                         .accept(MediaType.APPLICATION_JSON)
-
                 .exchange()
-
                 .expectStatus()
                     .isUnauthorized()
                 .expectBody()
@@ -194,9 +180,7 @@ class BookControllerTests {
                         .uri("/books")
                             .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(book)
-
                 .exchange()
-
                 .expectStatus()
                     .isCreated()
                 .expectBody(Book.class)
@@ -215,9 +199,7 @@ class BookControllerTests {
                         .uri("/books")
                             .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(book)
-
                 .exchange()
-
                 .expectStatus()
                     .isForbidden()
                 .expectBody()
@@ -233,9 +215,7 @@ class BookControllerTests {
                     .uri("/books")
                         .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(book)
-
                 .exchange()
-
                 .expectStatus()
                     .isUnauthorized()
                 .expectBody()
@@ -257,9 +237,7 @@ class BookControllerTests {
                         .uri("/books/" + book.isbn())
                             .contentType(MediaType.APPLICATION_JSON)
                                 .bodyValue(book)
-
                 .exchange()
-
                 .expectStatus()
                     .isOk()
                 .expectBody(Book.class)
@@ -278,9 +256,7 @@ class BookControllerTests {
                             .uri("/books" + book.isbn())
                                 .contentType(MediaType.APPLICATION_JSON)
                                     .bodyValue(book)
-
                     .exchange()
-
                     .expectStatus()
                         .isForbidden()
                     .expectBody()
@@ -295,9 +271,7 @@ class BookControllerTests {
                     .uri("/books/" + book.isbn())
                         .contentType(MediaType.APPLICATION_JSON)
                             .bodyValue(book)
-
                 .exchange()
-
                 .expectStatus()
                     .isUnauthorized()
                 .expectBody()
